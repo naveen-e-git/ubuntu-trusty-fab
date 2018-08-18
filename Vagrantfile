@@ -1,12 +1,12 @@
  Vagrant.configure("2") do |config|
   config.hostmanager.enabled = true
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/trusty"
   config.vm.synced_folder "vpro_app", "/root"
   config.vm.network 'public_network'
 
 ############################################ INSTALLING CI SERVER ###############################################################################
   config.vm.define "ci" do |build|
-   build.vm.hostname = 'build.com'
+   build.vm.hostname = 'build01.com'
    build.vm.network "private_network", ip: "192.168.10.10"
    build.vm.provision :shell, inline: <<-SHELL
    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
@@ -23,12 +23,12 @@
    sudo apt install fabric -y
    echo "#######################################################################################"
    sudo pip install fabric
-   fab ciserver_u
+   fab ci_u
    SHELL
 end
 
   config.vm.define "app" do |app|
-   app.vm.hostname = 'app.com'
+   app.vm.hostname = 'app01.com'
    app.vm.network "private_network", ip: "192.168.10.11"
    app.vm.provision :shell, inline: <<-SHELL
    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
@@ -49,10 +49,10 @@ end
    SHELL
 end
 
-  config.vm.define "app" do |app|
-   app.vm.hostname = 'app.com'
-   app.vm.network "private_network", ip: "192.168.10.11"
-   app.vm.provision :shell, inline: <<-SHELL
+  config.vm.define "db" do |db|
+   db.vm.hostname = 'db01.com'
+   db.vm.network "private_network", ip: "192.168.10.11"
+   db.vm.provision :shell, inline: <<-SHELL
    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
    sudo systemctl restart ssh
    cd /root

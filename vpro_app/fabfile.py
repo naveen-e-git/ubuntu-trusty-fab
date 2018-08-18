@@ -13,7 +13,9 @@ def if_condition():
 
    
 def ubuntu():
-    ciserver_u
+    ci_u
+    app_u
+    db_u
 
 
 def centos():
@@ -21,7 +23,7 @@ def centos():
 
 ######################################### 
 
-def ciserver_u():
+def ci_u():
      sudo("apt-get update -y")
      sudo("add-apt-repository ppa:openjdk-r/ppa -y")
      #sudo("apt-get install java* -y")
@@ -34,14 +36,16 @@ def ciserver_u():
      with cd("/root/VProfile"):
          sudo("sed -i 's/password=password/password=root/g' src/main/resources/application.properties")
          sudo("sed -i 's/newuser/root/g' src/main/resources/application.properties")
-         sudo("sed -i 's/localhost:3306/db.com:3306/' src/main/resources/application.properties")
-         sudo("sed -i 's/address=127.0.0.1/address='rmq.com'/' src/main/resources/application.properties")
-         sudo("sed -i 's/active.host=127.0.0.1/active.host='memcache.com'/' src/main/resources/application.properties")
+         sudo("sed -i 's/localhost:3306/db01.com:3306/' src/main/resources/application.properties")
+         sudo("sed -i 's/address=127.0.0.1/address='rmq01.com'/' src/main/resources/application.properties")
+         sudo("sed -i 's/active.host=127.0.0.1/active.host='memcache01.com'/' src/main/resources/application.properties")
          sudo("mvn clean install")
 
 
 def app_u():
-     sudo("apt update ")
+     sudo("apt update -y")
+     sudo("add-apt-repository ppa:openjdk-r/ppa -y")
+     sudo("apt update")
      sudo("apt install openjdk-8-jdk -y")
      sudo("apt install wget -y")
      with cd("/root"):
@@ -51,8 +55,6 @@ def app_u():
           sudo("tar -xvzf apache-tomcat-8.5.32.tar.gz")
           sudo("rm -rf /opt/apache-tomcat-8.5.32/webapps/ROOT")
           sudo("cp /root/VProfile/target/vprofile-v1.war /opt/apache-tomcat-8.5.32/webapps/ROOT.war")
-          #sudo("systemctl stop firewalld")
-          #sudo("systemctl disable firewalld")
           sudo("nohup /opt/apache-tomcat-8.5.32/bin/startup.sh &")
 
 
@@ -61,13 +63,13 @@ def db_u():
      sudo("debconf-set-selection <<< 'mqsql-server mysql-server/root_password_again password root'")
      sudo("apt update -y")
      sudo("apt install mysql-server -y")
-     sudo("systemctl start mysql")
+     sudo("service mysql start")
      sudo("sed -i 's/127.0.0.1/0.0.0.0/' /etc/my.cnf")
      sudo("mysql -u root -e \"create database accounts\" --password='root';")
      sudo("mysql -u root -e  \"grant all privileges on *.* TO 'root'@'app.com' identified by 'root'\" --password='root';")
      sudo("mysql -u root  accounts < /root/VProfile/src/main/resources/db_backup.sql;")
      sudo("mysql -u root -e \"FLUSH PRIVILEGES\" --password='root';")
-     sudo("systemctl restart mysql")
+     sudo("service mysql restart")
 
 
 def lb_u():
