@@ -1,6 +1,6 @@
  Vagrant.configure("2") do |config|
   config.hostmanager.enabled = true
-  config.vm.box = "ubuntu/trusty"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder "vpro_app", "/root"
   config.vm.network 'public_network'
 
@@ -29,7 +29,7 @@ end
 
   config.vm.define "app" do |app|
    app.vm.hostname = 'app01.com'
-   app.vm.network "private_network", ip: "192.168.10.11"
+   app.vm.network "private_network", ip: "192.168.10.12"
    app.vm.provision :shell, inline: <<-SHELL
    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
    sudo systemctl restart ssh
@@ -51,7 +51,7 @@ end
 
   config.vm.define "db" do |db|
    db.vm.hostname = 'db01.com'
-   db.vm.network "private_network", ip: "192.168.10.11"
+   db.vm.network "private_network", ip: "192.168.10.13"
    db.vm.provision :shell, inline: <<-SHELL
    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
    sudo systemctl restart ssh
@@ -68,6 +68,28 @@ end
    echo "#######################################################################################"
    sudo pip install fabric
    fab db_u
+   SHELL
+end
+
+  config.vm.define "lb" do |lb|
+   lb.vm.hostname = 'lb01.com'
+   lb.vm.network "private_network", ip: "192.168.10.14"
+   lb.vm.provision :shell, inline: <<-SHELL
+   sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
+   sudo systemctl restart ssh
+   cd /root
+   echo "installing python"
+   sudo apt install python2.7 -y
+   sudo apt update
+   echo ""
+   echo "#############################################################"
+   sudo apt install python-pip -y
+   sudo pip install --upgrade pip
+   echo "##############################installing fabric##########################################"
+   sudo apt install fabric -y
+   echo "#######################################################################################"
+   sudo pip install fabric
+   fab lb_u
    SHELL
 end
 end

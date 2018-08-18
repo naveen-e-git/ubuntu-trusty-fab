@@ -16,7 +16,9 @@ def ubuntu():
     ci_u
     app_u
     db_u
-
+    lb_u
+    memcache_u
+    rmq_u
 
 def centos():
     ciserver_c()
@@ -59,15 +61,15 @@ def app_u():
 
 
 def db_u():
-     sudo("debconf-set-selection <<< 'mqsql-server mysql-server/root_password password root'")
-     sudo("debconf-set-selection <<< 'mqsql-server mysql-server/root_password_again password root'")
+     sudo("apt update")
+     sudo("debconf-set-selections <<< \"mqsql-server mysql-server/root_password password root\"")
+     sudo("debconf-set-selections <<< \"mqsql-server mysql-server/root_password_again password root\"")
      sudo("apt update -y")
      sudo("apt install mysql-server -y")
-     sudo("service mysql start")
-     sudo("sed -i 's/127.0.0.1/0.0.0.0/' /etc/my.cnf")
+     sudo("sed -i 's/127.0.0.1/0.0.0.0/' /etc/mysql/my.cnf")
      sudo("mysql -u root -e \"create database accounts\" --password='root';")
-     sudo("mysql -u root -e  \"grant all privileges on *.* TO 'root'@'app.com' identified by 'root'\" --password='root';")
-     sudo("mysql -u root  accounts < /root/VProfile/src/main/resources/db_backup.sql;")
+     sudo("mysql -u root -e  \"grant all privileges on *.* TO 'root'@'app01.com' identified by 'root'\" --password='root';")
+     sudo("mysql -u root --password='root' accounts < /root/VProfile/src/main/resources/db_backup.sql;")
      sudo("mysql -u root -e \"FLUSH PRIVILEGES\" --password='root';")
      sudo("service mysql restart")
 
@@ -77,9 +79,9 @@ def lb_u():
      sudo("cp /root/vproapp /etc/nginx/site-available/vproapp")
      sudo("rm -rf /etc/nginx/site-enabled/default")
      sudo("ln -s /etc/nginx/site-available/vproapp /etc/nginx/site-enabled/")
-     sudo("sudo systemctl restart nginx")
+     sudo("service nginx restart")
 
-def memcache_u()
+def memcache_u():
     sudo("apt install memcached -y")
     sudo("memcached -p 11111 -U 11111 -u memcached -d")
 
