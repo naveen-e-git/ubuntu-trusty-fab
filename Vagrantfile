@@ -92,4 +92,48 @@ end
    fab lb_u
    SHELL
 end
+
+  config.vm.define "mem" do |mem|
+   mem.vm.hostname = 'memcache.com'
+   mem.vm.network "private_network", ip: "192.168.10.14"
+   mem.vm.provision :shell, inline: <<-SHELL
+   sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
+   sudo systemctl restart ssh
+   cd /root
+   echo "installing python"
+   sudo apt install python2.7 -y
+   sudo apt update
+   echo ""
+   echo "#############################################################"
+   sudo apt install python-pip -y
+   sudo pip install --upgrade pip
+   echo "##############################installing fabric##########################################"
+   sudo apt install fabric -y
+   echo "#######################################################################################"
+   sudo pip install fabric
+   fab memcache_u
+   SHELL
+end
+
+  config.vm.define "rmq" do |rmq|
+   rmq.vm.hostname = 'rmq01.com'
+   rmq.vm.network "private_network", ip: "192.168.10.14"
+   rmq.vm.provision :shell, inline: <<-SHELL
+   sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes'/ /etc/ssh/sshd_config
+   sudo systemctl restart ssh
+   cd /root
+   echo "installing python"
+   sudo apt install python2.7 -y
+   sudo apt update
+   echo ""
+   echo "#############################################################"
+   sudo apt install python-pip -y
+   sudo pip install --upgrade pip
+   echo "##############################installing fabric##########################################"
+   sudo apt install fabric -y
+   echo "#######################################################################################"
+   sudo pip install fabric
+   fab rabbitmq_u
+   SHELL
+end
 end

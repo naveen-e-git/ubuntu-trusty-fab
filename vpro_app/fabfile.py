@@ -76,14 +76,15 @@ def db_u():
 
 def lb_u():
      sudo("apt install nginx -y")
-     sudo("cp /root/vproapp /etc/nginx/site-available/vproapp")
-     sudo("rm -rf /etc/nginx/site-enabled/default")
-     sudo("ln -s /etc/nginx/site-available/vproapp /etc/nginx/site-enabled/")
-     sudo("service nginx restart")
+     with cd("/root"):
+       sudo("cp vproapp /etc/nginx/site-available/")
+       sudo("rm -rf /etc/nginx/site-enabled/default")
+       sudo("ln -s /etc/nginx/site-available/vproapp /etc/nginx/site-enabled/vproapp")
+       sudo("service nginx restart")
 
 def memcache_u():
     sudo("apt install memcached -y")
-    sudo("memcached -p 11111 -U 11111 -u memcached -d")
+    sudo("memcached -p 11111 -U 11111 -u memcache -d")
 
 def rabbitmq_u():
     sudo("echo 'deb http://www.rabbitmq.com/debaian/ testing main' | sudo tee /etc/apt/source.list.d/rabbitmq.list")
